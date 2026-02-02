@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Premium Art Cover Flipbook - Grey Edition</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Noto+Sans+KR:wght@300;500&display=swap');
+
+      :root {
+        --book-w: 420px;
+        --book-h: 580px;
+        --anim-speed: 1.2s;
+      }
+
+      body {
+        /* [수정] 배경색을 어두운 배경에서 세련된 회색 계열로 변경 */
+        background: radial-gradient(circle at center, #8e9eab 0%, #3a6073 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+        font-family: 'Noto Sans KR', sans-serif;
+      }
+
+      .nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10000;
+        transition: 0.3s;
+        font-size: 24px;
+        backdrop-filter: blur(5px);
+      }
+      .nav-btn:hover {
+        background: white;
+        color: black;
+        transform: translateY(-50%) scale(1.1);
+      }
+      .prev-btn {
+        left: 50px;
+      }
+      .next-btn {
+        right: 50px;
+      }
+
+      .scene {
+        perspective: 3000px;
+        width: var(--book-w);
+        height: var(--book-h);
+      }
+
+      .book {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .state-first {
+        transform: rotateX(0deg) rotateY(-12deg) translateX(50%);
+      }
+      .state-middle {
+        transform: rotateX(0deg) rotateY(0deg) translateX(0);
+      }
+      .state-last {
+        transform: rotateX(0deg) rotateY(12deg) translateX(-50%);
+      }
+
+      .page {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        transform-origin: left center;
+        transform-style: preserve-3d;
+        transition: transform var(--anim-speed)
+          cubic-bezier(0.645, 0.045, 0.355, 1);
+      }
+
+      .front,
+      .back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        transform-style: flat;
+        background: #fff;
+        box-sizing: border-box;
+        border-radius: 0 5px 5px 0;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .back {
+        transform: rotateY(180deg);
+        border-radius: 5px 0 0 5px;
+        background: #f9f9f9;
+      }
+
+      /* 표지 및 뒷표지 전용 이미지 스타일 */
+      .cover-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        filter: brightness(0.6);
+      }
+
+      .cover-overlay {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.1);
+        border: 10px solid rgba(255, 255, 255, 0.1);
+        box-sizing: border-box;
+      }
+
+      .page::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.15), transparent);
+        z-index: 5;
+        opacity: 0;
+        transition: opacity var(--anim-speed);
+        pointer-events: none;
+      }
+      .page.flipped::before {
+        opacity: 1;
+      }
+
+      .page-img {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        display: block;
+      }
+      .content {
+        padding: 35px;
+      }
+      h2 {
+        font-family: 'Playfair Display';
+        font-size: 1.8rem;
+        margin: 0 0 15px 0;
+        color: #222;
+      }
+      p {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #555;
+      }
+
+      .page.flipped {
+        transform: rotateY(-180deg);
+      }
+    </style>
+  </head>
+  <body>
+    <button class="nav-btn prev-btn" onclick="prev()">&#10094;</button>
+
+    <div class="scene">
+      <div class="book state-first" id="book">
+        <div class="page" id="p1">
+          <div class="front">
+            <img
+              src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1000"
+              class="cover-img"
+            />
+            <div class="cover-overlay">
+              <h1
+                style="
+                  font-family: 'Playfair Display';
+                  font-size: 4rem;
+                  margin: 0;
+                  letter-spacing: 5px;
+                "
+              >
+                COSMOS
+              </h1>
+              <p style="font-weight: 300; letter-spacing: 2px">
+                A JOURNEY THROUGH SPACE
+              </p>
+            </div>
+          </div>
+          <div class="back">
+            <div class="content">
+              <h2>The Beginning</h2>
+              <p>철이의 여행은 아주 작은 달과 태양 하나에서 시작되었습니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="page" id="p2">
+          <div class="front">
+            <img
+              src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=800"
+              class="page-img"
+            />
+            <div class="content">
+              <h2>01. Morning Mist</h2>
+              <p>새벽의 안개가 대지를 부드럽게 감쌉니다.</p>
+            </div>
+          </div>
+          <div class="back"></div>
+        </div>
+
+        <div class="page" id="p3">
+          <div class="front">
+            <img
+              src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800"
+              class="page-img"
+            />
+            <div class="content">
+              <h2>02. Pure Water</h2>
+              <p>투명한 수면 아래 숨겨진 평화.</p>
+            </div>
+          </div>
+          <div class="back"></div>
+        </div>
+
+        <div class="page" id="p4">
+          <div class="front">
+            <img
+              src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800"
+              class="page-img"
+            />
+            <div class="content">
+              <h2>03. Deep Sunlight</h2>
+              <p>나뭇잎 사이로 부서지는 찬란한 빛줄기.</p>
+            </div>
+          </div>
+          <div class="back"></div>
+        </div>
+
+        <div class="page" id="p5">
+          <div class="front">
+            <img
+              src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800"
+              class="page-img"
+            />
+            <div class="content">
+              <h2>04. High Peaks</h2>
+              <p>하늘을 찌를 듯 솟은 위대한 산맥들.</p>
+            </div>
+          </div>
+          <div class="back"></div>
+        </div>
+
+        <div class="page" id="p6">
+          <div class="front">
+            <img
+              src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800"
+              class="page-img"
+            />
+            <div class="content">
+              <h2>05. Green Field</h2>
+              <p>바람이 지나가는 자리에 초록색 물결이 일렁입니다.</p>
+            </div>
+          </div>
+          <div class="back"></div>
+        </div>
+
+        <div class="page" id="p7">
+          <div class="front">
+            <img
+              src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800"
+              class="page-img"
+            />
+            <div class="content">
+              <h2>06. Golden Hour</h2>
+              <p>세상이 황금빛으로 물드는 마법 같은 시간.</p>
+            </div>
+          </div>
+          <div class="back"></div>
+        </div>
+
+        <div class="page" id="p8">
+          <div class="front">
+            <img
+              src="https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=800"
+              class="page-img"
+            />
+            <div class="content">
+              <h2>07. Silent Lake</h2>
+              <p>고요한 호수는 마음을 비추는 거울이 됩니다.</p>
+            </div>
+          </div>
+          <div class="back"></div>
+        </div>
+
+        <div class="page" id="p9">
+          <div class="front">
+            <img
+              src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800"
+              class="page-img"
+            />
+            <div class="content">
+              <h2>08. Great Canyon</h2>
+              <p>시간의 흐름이 깎아 만든 장엄한 예술작품.</p>
+            </div>
+          </div>
+          <div class="back"></div>
+        </div>
+
+        <div class="page" id="p10">
+          <div class="front">
+            <img
+              src="https://images.unsplash.com/photo-1444333509404-8597c88d745a?w=1000"
+              class="cover-img"
+            />
+            <div class="cover-overlay">
+              <h1
+                style="
+                  font-family: 'Playfair Display';
+                  font-size: 3.5rem;
+                  margin: 0;
+                "
+              >
+                ETERNITY
+              </h1>
+              <p
+                style="font-weight: 300; letter-spacing: 2px; margin-top: 10px"
+              >
+                The End of Chapter
+              </p>
+            </div>
+          </div>
+          <div class="back">
+            <img
+              src="https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=1000"
+              class="cover-img"
+            />
+            <div class="cover-overlay">
+              <p
+                style="
+                  font-family: 'Playfair Display';
+                  font-size: 1.2rem;
+                  letter-spacing: 5px;
+                "
+              >
+                FINISH
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="nav-btn next-btn" onclick="next()">&#10095;</button>
+
+    <script>
+      let curr = 1;
+      const total = 10;
+      const book = document.getElementById('book');
+      let isResetting = false;
+
+      function updateBookState() {
+        book.classList.remove('state-first', 'state-middle', 'state-last');
+        if (curr === 1) book.classList.add('state-first');
+        else if (curr > total) book.classList.add('state-last');
+        else book.classList.add('state-middle');
+      }
+
+      function updateZIndex() {
+        for (let i = 1; i <= total; i++) {
+          const page = document.getElementById(`p${i}`);
+          if (i < curr) page.style.zIndex = i;
+          else page.style.zIndex = total - i + 1;
+        }
+      }
+
+      function next() {
+        if (isResetting) return;
+        if (curr <= total) {
+          document.getElementById(`p${curr}`).classList.add('flipped');
+          curr++;
+          updateBookState();
+          updateZIndex();
+        } else {
+          autoReset();
+        }
+      }
+
+      function prev() {
+        if (isResetting) return;
+        if (curr > 1) {
+          curr--;
+          document.getElementById(`p${curr}`).classList.remove('flipped');
+          updateBookState();
+          updateZIndex();
+        }
+      }
+
+      function autoReset() {
+        isResetting = true;
+        curr = 1;
+        updateBookState();
+        for (let i = total; i >= 1; i--) {
+          setTimeout(
+            () => {
+              document.getElementById(`p${i}`).classList.remove('flipped');
+              updateZIndex();
+              if (i === 1) isResetting = false;
+            },
+            (total - i) * 120,
+          );
+        }
+      }
+      updateZIndex();
+    </script>
+  </body>
+</html>
